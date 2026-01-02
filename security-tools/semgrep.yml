@@ -1,1 +1,6 @@
+rules:
+  - id: command-injection
+    pattern: os.popen(...)
+    message: "Command Injection Risk"
+    severity: ERROR
 
