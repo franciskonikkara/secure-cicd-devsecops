@@ -2,6 +2,21 @@ rules:
   - id: python-command-injection
     languages:
       - python
-    pattern: os.popen(...)
-    message: "Command Injection Risk: os.popen allows command execution"
+    message: "Possible command injection detected via os.popen"
     severity: ERROR
+    patterns:
+      - pattern: os.popen($CMD)
+
+  - id: hardcoded-secret
+    languages:
+      - python
+    message: "Hardcoded secret detected."
+    severity: ERROR
+    pattern-regex: "(AKIA|ASIA)[0-9A-Z]{16}"
+
+  - id: insecure-subprocess
+    languages:
+      - python
+    message: "Use of subprocess with shell=True can lead to command injection."
+    severity: WARNING
+    pattern: subprocess.call(..., shell=True, ...)
