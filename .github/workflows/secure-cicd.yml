@@ -2,81 +2,113 @@ name: Secure CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
 
 jobs:
   security:
+    name: Security Scans & Compliance Gates
     runs-on: ubuntu-latest
 
     steps:
+    # ----------------------------------------------------
+    # Step 1: Checkout Source Code
+    # ----------------------------------------------------
     - name: Checkout source code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
-    # -----------------------------
-    # Secrets Scanning
-    # -----------------------------
+    # ----------------------------------------------------
+    # Step 2: Gitleaks - Secrets Scanning (Manual, No Hidden Dependencies)
+    # ----------------------------------------------------
     - name: Run Gitleaks (Secrets Scanning)
-      uses: gitleaks/gitleaks-action@v2
-      env:
-        GITLEAKS_ENABLE_UPLOAD_ARTIFACT: true
+      run: |
+        curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64.tar.gz | tar -xz
+        ./gitleaks detect \
+          --source . \
+          --report-format json \
+          --report-path gitleaks-report.json \
+          --exit-code 1
 
-    # -----------------------------
-    # Python Setup
-    # -----------------------------
-    - name: Setup Python
-      uses: actions/setup-python@v4
+    - name: Upload Gitleaks Report
+      uses: actions/upload-artifact@v4
       with:
-        python-version: 3.9
+        name: gitleaks-report
+        path: gitleaks-report.json
 
-    # -----------------------------
-    # Semgrep SAST
-    # -----------------------------
+    # ----------------------------------------------------
+    # Step 3: Setup Python
+    # ----------------------------------------------------
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.9"
+
+    # ----------------------------------------------------
+    # Step 4: Install Semgrep (SAST)
+    # ----------------------------------------------------
     - name: Install Semgrep
       run: pip install semgrep
 
+    # ----------------------------------------------------
+    # Step 5: Run Semgrep (Fail on HIGH/CRITICAL)
+    # ----------------------------------------------------
     - name: Run SAST (Semgrep)
       run: |
-        mkdir -p security-reports
-        semgrep --config security-tools/semgrep.yml app/ \
-          --json > security-reports/semgrep-results.json
+        semgrep \
+          --config security-tools/semgrep.yml \
+          --json \
+          --output semgrep-report.json \
+          app/
 
-    # -----------------------------
-    # Build Container
-    # -----------------------------
+    - name: Upload Semgrep Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: semgrep-report
+        path: semgrep-report.json
+
+    # ----------------------------------------------------
+    # Step 6: Build Docker Image
+    # ----------------------------------------------------
     - name: Build Docker Image
-      run: docker build -t insecure-app .
+      run: docker build -t secure-pipeline-app:latest app/
 
-    # -----------------------------
-    # Trivy Container Scan
-    # -----------------------------
+    # ----------------------------------------------------
+    # Step 7: Trivy - Container Vulnerability Scan
+    # ----------------------------------------------------
     - name: Run Container Scan (Trivy)
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: insecure-app
+        image-ref: secure-pipeline-app:latest
         format: json
-        output: security-reports/trivy-results.json
+        output: trivy-report.json
         severity: CRITICAL,HIGH
         exit-code: 1
 
-    # -----------------------------
-    # Upload Audit / SIEM Evidence
-    # -----------------------------
-    - name: Upload Security Scan Reports
-      uses: actions/upload-artifact@v3
+    - name: Upload Trivy Report
+      uses: actions/upload-artifact@v4
       with:
-        name: security-scan-reports
-        path: security-reports/
+        name: trivy-report
+        path: trivy-report.json
 
+    # ----------------------------------------------------
+    # Step 8: Generate Compliance Audit Evidence
+    # ----------------------------------------------------
     - name: Generate Audit Evidence
       run: |
         mkdir -p audit-evidence
-        echo "Build ID: $GITHUB_RUN_ID" >> audit-evidence/build-log.txt
+        echo "Pipeline Run ID: $GITHUB_RUN_ID" > audit-evidence/build-log.txt
         echo "Commit SHA: $GITHUB_SHA" >> audit-evidence/build-log.txt
-        echo "Repository: $GITHUB_REPOSITORY" >> audit-evidence/build-log.txt
+        echo "Branch: $GITHUB_REF_NAME" >> audit-evidence/build-log.txt
+        echo "Timestamp: $(date -u)" >> audit-evidence/build-log.txt
 
     - name: Upload Audit Evidence
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: audit-evidence
         path: audit-evidence/
