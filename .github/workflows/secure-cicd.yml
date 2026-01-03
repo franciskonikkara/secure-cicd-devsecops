@@ -26,20 +26,21 @@ jobs:
     # ----------------------------------------------------
     # Step 2: Gitleaks - Secrets Scanning (Manual, No Hidden Dependencies)
     # ----------------------------------------------------
+    - name: Install Gitleaks
+      run: |
+        GITLEAKS_VERSION=8.18.2
+        curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz -o gitleaks.tar.gz
+        tar -xzf gitleaks.tar.gz
+        sudo mv gitleaks /usr/local/bin/
+
+
     - name: Run Gitleaks (Secrets Scanning)
       run: |
-        curl -sSL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64.tar.gz | tar -xz
-        ./gitleaks detect \
+        gitleaks detect \
           --source . \
           --report-format json \
           --report-path gitleaks-report.json \
           --exit-code 1
-
-    - name: Upload Gitleaks Report
-      uses: actions/upload-artifact@v4
-      with:
-        name: gitleaks-report
-        path: gitleaks-report.json
 
     # ----------------------------------------------------
     # Step 3: Setup Python
