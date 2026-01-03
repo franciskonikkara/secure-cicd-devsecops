@@ -1,5 +1,7 @@
 #  1. Secure CI/CD Pipeline with Enforced Security Gates
 
+Implemented a SOC 2 and ISO 27001–aligned CI/CD security pipeline using GitHub Actions, Semgrep, Trivy, and Gitleaks, generating SIEM-ready audit evidence and enforcing automated security gates on every commit.
+
 ## Overview
 
 This repository demonstrates a **production-grade secure CI/CD pipeline** built with **GitHub Actions** and aligned with **SOC 2** and **ISO/IEC 27001** security controls.
