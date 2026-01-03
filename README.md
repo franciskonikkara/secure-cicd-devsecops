@@ -64,8 +64,8 @@ The issue was resolved by upgrading the container base image to Python 3.9-slim.
 
 ![Alt text](architecture/python_version.png?raw=true)
 
-###❌ Failure: Pipeline broke due to non-deterministic tooling download  
-###✅ Fix: Pinned Gitleaks binary version to ensure deterministic CI execution
+### ❌ Failure: Pipeline broke due to non-deterministic tooling download  
+### ✅ Fix: Pinned Gitleaks binary version to ensure deterministic CI execution
 
 ## ✅ Remediation
 
