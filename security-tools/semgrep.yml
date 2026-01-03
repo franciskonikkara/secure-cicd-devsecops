@@ -1,6 +1,7 @@
 rules:
-  - id: command-injection
+  - id: python-command-injection
+    languages:
+      - python
     pattern: os.popen(...)
-    message: "Command Injection Risk"
+    message: "Command Injection Risk: os.popen allows command execution"
     severity: ERROR
-
