@@ -48,6 +48,20 @@ Security failures **intentionally block the pipeline**.
 * Gitleaks failed the pipeline
 ![Alt text](architecture/aws_secret_1.png?raw=true "AWS secret key")
 ![Alt text](architecture/aws_secret_2.png?raw=true)
+
+### ❌ Runtime Compatibility Failure (Python Version Mismatch)
+
+The container build initially failed due to a mismatch between the base Python image (3.7) and upgraded application dependencies (Flask 2.3.3 requires Python ≥ 3.8).
+
+This demonstrated:
+- Dependency upgrades can introduce platform compatibility risks
+- CI/CD correctly prevented the deployment of a broken runtime
+- Secure upgrades must be coordinated with base image updates
+
+The issue was resolved by upgrading the container base image to Python 3.9-slim.
+
+![Alt text](architecture/python_version.png?raw=true)
+
 ## ✅ Remediation
 
 * Fixed Semgrep rule schema
