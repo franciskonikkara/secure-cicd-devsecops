@@ -8,6 +8,7 @@ app = Flask(__name__)
 def home():
     return "Secure CI/CD Demo"
 
+# Vulnerable section of the code that provides command execution and privelege escalation
 @app.route("/cmd")
 def cmd():
     user_cmd = request.args.get("cmd")
