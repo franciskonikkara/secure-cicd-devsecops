@@ -41,13 +41,13 @@ Security failures **intentionally block the pipeline**.
 * Flask 0.12 introduced known CVEs
 * Trivy blocked the build
 ![Alt text](architecture/Flask_vulnerability_image.png?raw=true "Flask Version vulnerability with known CVEs")
+
 ### ❌ Secrets Exposure
 
 * Hardcoded AWS secret detected
 * Gitleaks failed the pipeline
-
----
-
+![Alt text](architecture/aws_secret_1.png?raw=true "AWS secret key")
+![Alt text](architecture/aws_secret_2.png?raw=true)
 ## ✅ Remediation
 
 * Fixed Semgrep rule schema
