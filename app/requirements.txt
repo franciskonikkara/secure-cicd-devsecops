@@ -1,2 +1,4 @@
-flask==2.0.1
+# flask==2.0.1 // Vulnerable version with CVE added on purpose
+flask==2.3.3
+
 
