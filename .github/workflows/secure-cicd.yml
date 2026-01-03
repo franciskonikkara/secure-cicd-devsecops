@@ -9,33 +9,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout source code
       uses: actions/checkout@v3
 
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: 3.9
 
-    - name: Install dependencies
-      run: |
-        pip install semgrep flask
+    - name: Install SAST tool
+      run: pip install semgrep
 
     - name: Run SAST (Semgrep)
-      run: |
-        semgrep --config security-tools/semgrep.yml app/
+      run: semgrep --config security-tools/semgrep.yml app/
 
-    - name: Build Docker image
-      run: |
-        docker build -t insecure-app app/
+    - name: Build Docker Image
+      run: docker build -t insecure-app app/
 
     - name: Run Container Scan (Trivy)
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: insecure-app
-        severity: CRITICAL, HIGH
+        severity: CRITICAL,HIGH
         exit-code: 1
 
-    - name: Generate audit artifact
+    - name: Generate Audit Evidence
       run: |
         echo "Build ID: $GITHUB_RUN_ID" >> audit-evidence/build-log.txt
