@@ -40,7 +40,7 @@ Security failures **intentionally block the pipeline**.
 
 * Flask 0.12 introduced known CVEs
 * Trivy blocked the build
-
+![Alt text](architecture/Flask_vulnerability_image.png?raw=true "Flask Version vulnerability with known CVEs")
 ### ❌ Secrets Exposure
 
 * Hardcoded AWS secret detected
