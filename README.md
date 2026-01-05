@@ -108,7 +108,26 @@ These artifacts can be ingested into:
 
 This enables centralized security monitoring and alerting.
 
----
+## Compliance Mapping
+
+This project demonstrates CI/CD security controls aligned with:
+
+### SOC 2
+- CC5: Risk Assessment (automated security scanning)
+- CC6: Access Control (secrets detection)
+- CC7: Security Monitoring (CI enforcement)
+- CC8: Change Management (pre-merge validation)
+- CC9: Risk Mitigation (build blocking)
+
+### ISO/IEC 27001
+- A.8.8: Vulnerability Management
+- A.8.9: Configuration Management
+- A.8.15: Logging
+- A.8.16: Monitoring
+- A.14.2: Secure Development Lifecycle
+
+Audit artifacts are generated and retained for every pipeline run.
+
 
 ## Key Outcomes
 
